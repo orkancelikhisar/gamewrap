@@ -17,7 +17,6 @@ trap 'rm -rf "$WORK"' EXIT
 APP="$WORK/GameWrap.app"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN" "$APP/Contents/MacOS/GameWrap"
-cp -R "$(dirname "$BIN")/GameWrap_GameWrapApp.bundle" "$APP/Contents/Resources/"
 cp "$HERE/assets/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
 cp "$HERE/LICENSE" "$APP/Contents/Resources/LICENSE.txt"
 cp "$HERE/THIRD_PARTY_NOTICES.md" "$APP/Contents/Resources/THIRD_PARTY_NOTICES.md"

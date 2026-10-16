@@ -1,6 +1,6 @@
 # GameWrap
 
-![Solarpunk gaming garden](Sources/GameWrapApp/Resources/solarpunk.png)
+![Solarpunk gaming garden](assets/solarpunk.png)
 
 **Turn Windows games into Mac apps.**
 

@@ -7,9 +7,6 @@ struct DropView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            SolarpunkArtwork().frame(height: 170)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .accessibilityHidden(true)
             VStack(spacing: 8) {
                 Text("Add a Windows game").font(.title2.weight(.semibold))
                 Text("Drop a game folder or archive to create a Mac app.")

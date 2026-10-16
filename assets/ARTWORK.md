@@ -1,6 +1,6 @@
 # Solarpunk artwork
 
-Generated for GameWrap on 2026-10-16 with the built-in OpenAI image-generation tool (stylized-concept). No reference image was used. The full illustration is stored at `Sources/GameWrapApp/Resources/solarpunk.png`, bundled in the app and displayed in the README. It is included under the repository's MIT license to the extent applicable.
+Generated for GameWrap on 2026-10-16 with the built-in OpenAI image-generation tool (stylized-concept). No reference image was used. The full illustration is stored at `assets/solarpunk.png`, displayed in the README; it is not bundled in the app. It is included under the repository's MIT license to the extent applicable.
 
 ## Generation prompt
 

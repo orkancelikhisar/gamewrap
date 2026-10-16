@@ -9,21 +9,6 @@ enum FieldStyle {
     static let line = Color(nsColor: .separatorColor)
 }
 
-struct SolarpunkArtwork: View {
-    private static let image = Bundle.module.url(forResource: "solarpunk", withExtension: "png")
-        .flatMap { NSImage(contentsOf: $0) }
-
-    var body: some View {
-        GeometryReader { geometry in
-            if let image = Self.image {
-                Image(nsImage: image).resizable().scaledToFill()
-                .frame(width: geometry.size.width, height: geometry.size.height)
-                .clipped()
-            }
-        }
-    }
-}
-
 struct FieldButton: ButtonStyle {
     var primary = false
     @Environment(\.isEnabled) private var enabled
