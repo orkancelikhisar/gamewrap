@@ -52,6 +52,12 @@ Your original game files stay untouched. Each generated app includes its own run
 
 Saves, Windows settings, and `last-run.log` live in `~/Library/Application Support/<Game name>/`. The runtime cache lives in `~/Library/Application Support/GameWrap/runtimes/`. Removing a generated app does not delete its saves. Games with the same app name share that support folder, so use distinct names for separate installations.
 
+## Network and accounts
+
+GameWrap requires no GitHub account or sign-in. Its only application network request is the first-time runtime download from the public Gcenx GitHub release (and normal download redirects). It contains no analytics or telemetry and does not upload your games or diagnostics. GitHub receives ordinary download-request metadata. Once cached, the runtime can be reused offline. Games themselves may have their own network behavior.
+
+GitHub Actions checks run when repository code changes, independently of people running GameWrap. Failure emails go to repository subscribers according to their GitHub notification settings.
+
 ## Development and contributions
 
 ```sh
