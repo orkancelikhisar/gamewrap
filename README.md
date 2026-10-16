@@ -52,6 +52,10 @@ Your original game files stay untouched. Each generated app includes its own run
 
 Saves, Windows settings, and `last-run.log` live in `~/Library/Application Support/<Game name>/`. The runtime cache lives in `~/Library/Application Support/GameWrap/runtimes/`. Removing a generated app does not delete its saves. Games with the same app name share that support folder, so use distinct names for separate installations.
 
+## Experimental Unity 6 compatibility
+
+Some Unity 6 games need a newer Wine input implementation and a matching Metal graphics backend. OFFRECORD reached its menu and opening scene with a patched Wine 11.8 + DXMT 0.80 configuration. See [tested configuration and repair workflow](docs/compatibility/OFFRECORD.md). This opt-in developer workflow creates a separate app; it is not a universal compatibility guarantee.
+
 ## Network and accounts
 
 GameWrap requires no GitHub account or sign-in. Its only application network request is the first-time runtime download from the public Gcenx GitHub release (and normal download redirects). It contains no analytics or telemetry and does not upload your games or diagnostics. GitHub receives ordinary download-request metadata. Once cached, the runtime can be reused offline. Games themselves may have their own network behavior.
