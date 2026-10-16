@@ -29,15 +29,18 @@ final class AppModel: ObservableObject {
     @Published var progress: Double?
     @Published var log = ""
 
+    @Published var runtimeProfile: RuntimeProfile = .standard {
+        didSet { runtimeInstalled = gameWrap.runtime.isInstalled() }
+    }
     @Published var runtimeInstalled: Bool
     @Published var runtimeProgress: Double?
 
-    let gameWrap = GameWrap()
+    var gameWrap: GameWrap { GameWrap(runtime: runtimeProfile.manager) }
     private var destinationChosen = false
     private var buildTask: Task<Void, Never>?
 
     init() {
-        runtimeInstalled = gameWrap.runtime.isInstalled()
+        runtimeInstalled = RuntimeManager().isInstalled()
         NotificationCenter.default.addObserver(forName: NSApplication.willTerminateNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
                 if let self, let info = self.info { self.gameWrap.discard(info) }
@@ -96,13 +99,16 @@ final class AppModel: ObservableObject {
     }
 
     func downloadRuntime() {
+        guard runtimeProgress == nil else { return }
+        let selected = runtimeProfile
+        let runtime = selected.manager
         runtimeProgress = 0
         Task {
             do {
-                _ = try await gameWrap.runtime.ensureInstalled { value in
-                    Task { @MainActor in self.runtimeProgress = value }
+                _ = try await runtime.ensureInstalled { value in
+                    Task { @MainActor in if self.runtimeProfile == selected { self.runtimeProgress = value } }
                 }
-                runtimeInstalled = true
+                runtimeInstalled = gameWrap.runtime.isInstalled()
             } catch {
                 // Only take over the window from the drop screen; a running build reports its own errors.
                 if case .drop = phase { show(error) } else { log += "Runtime download failed: \(error.localizedDescription)\n" }
@@ -121,9 +127,10 @@ final class AppModel: ObservableObject {
         progress = nil
         log = ""
         phase = .building
+        let builder = gameWrap
         buildTask = Task {
             do {
-                for try await event in gameWrap.build(info, config, overwrite: overwrite) {
+                for try await event in builder.build(info, config, overwrite: overwrite) {
                     switch event {
                     case .step(let step, let state):
                         steps[step] = state

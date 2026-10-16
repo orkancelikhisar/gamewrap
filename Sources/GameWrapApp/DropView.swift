@@ -70,13 +70,13 @@ struct RuntimeStatusView: View {
         HStack(spacing: 8) {
             if model.runtimeInstalled {
                 Image(systemName: "checkmark.circle.fill").foregroundStyle(FieldStyle.ink)
-                Text("Windows runtime ready")
+                Text(model.runtimeProfile == .unity6 ? "DXMT runtime ready" : "Windows runtime ready")
             } else if let progress = model.runtimeProgress {
                 ProgressView(value: progress).frame(width: 80)
                 Text("Downloading runtime…")
             } else {
                 Image(systemName: "arrow.down.circle")
-                Button("Get Windows runtime · 240 MB", action: model.downloadRuntime)
+                Button("Get Windows runtime · \(model.runtimeProfile.downloadSize)", action: model.downloadRuntime)
                     .buttonStyle(.plain).underline()
             }
         }

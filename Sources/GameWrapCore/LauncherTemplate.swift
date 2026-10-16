@@ -18,6 +18,7 @@ function run(argv) {
     'GW_NAME=' + q(m.name),
     'GW_EXE=' + q(m.exe),
     'GW_SHOWFPS=' + (m.showFPS ? 1 : 0),
+    'GW_DXMT=' + (m.runtime === 'wine-dxmt-11.8-0.80-v1' ? 1 : 0),
     'GW_ARGS=(' + (m.args || []).map(q).join(' ') + ')',
     'GW_REDISTS=(' + (m.redists || []).map(q).join(' ') + ')'
   ];
@@ -36,11 +37,18 @@ fi
 
 SAFE_NAME="${GW_NAME//[\/:]/-}"
 SUPPORT="$HOME/Library/Application Support/$SAFE_NAME"
+(( GW_DXMT )) && SUPPORT="$SUPPORT/DXMT"
 LOG="$SUPPORT/last-run.log"
 WINE="$RES/wine/bin/wine64"
 EXE_DIR="$RES/game/${GW_EXE:h}"
 export WINEPREFIX="$SUPPORT/prefix"
 export WINEDLLOVERRIDES="winemenubuilder.exe=d"
+if (( GW_DXMT )); then
+  WINE="$RES/wine/bin/wine"
+  export WINEDLLOVERRIDES="winemenubuilder.exe=d;dxgi,d3d11,d3d10core=b"
+  export DYLD_FALLBACK_LIBRARY_PATH="$RES/wine/lib:/usr/lib"
+  unset WINEMSYNC
+fi
 export WINEDEBUG=-all
 (( GW_SHOWFPS )) && export MTL_HUD_ENABLED=1
 cmd=("$WINE" "${GW_EXE:t}" "${GW_ARGS[@]}")
@@ -74,10 +82,18 @@ if [[ ! -f "$WINEPREFIX/.gamewrap-ready" ]]; then
     "$WINE" "$RES/game/$redist" /install /quiet /norestart >> "$LOG" 2>&1
   done
   "$RES/wine/bin/wineserver" -w
+  if (( GW_DXMT )); then
+    for dll in winemetal d3d11 dxgi d3d10core; do
+      cp "$RES/wine/lib/wine/x86_64-windows/$dll.dll" "$WINEPREFIX/drive_c/windows/system32/$dll.dll" || exit 1
+    done
+  fi
   touch "$WINEPREFIX/.gamewrap-ready"
 fi
 
 cd "$EXE_DIR" || { alert "The game files are missing: $EXE_DIR"; exit 1; }
+if (( GW_DXMT )); then
+  exec "${cmd[@]}" > "$LOG" 2>&1
+fi
 start=$SECONDS
 "${cmd[@]}" > "$LOG" 2>&1
 rc=$?

@@ -9,7 +9,7 @@ let package = Package(
         .executable(name: "GameWrap", targets: ["GameWrapApp"]),
     ],
     targets: [
-        .target(name: "GameWrapCore"),
+        .target(name: "GameWrapCore", resources: [.process("Resources")]),
         .executableTarget(name: "GameWrapApp", dependencies: ["GameWrapCore"]),
         .testTarget(name: "GameWrapCoreTests", dependencies: ["GameWrapCore"]),
         .testTarget(name: "GameWrapAppTests", dependencies: ["GameWrapApp"]),

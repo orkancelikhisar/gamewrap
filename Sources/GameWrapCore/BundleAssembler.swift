@@ -29,7 +29,7 @@ public struct BundleAssembler: Sendable {
 
         let wineDestination = resources.appendingPathComponent("wine")
         try await runner.run(Tool.ditto, [wine.path, wineDestination.path])
-        try Data(Self.wineNotice.utf8).write(to: wineDestination.appendingPathComponent("LICENSE-NOTICE.txt"))
+        try Data((manifest.runtime == DXMTRuntimeManager.runtimeID ? Self.dxmtNotice : Self.wineNotice).utf8).write(to: wineDestination.appendingPathComponent("LICENSE-NOTICE.txt"))
         try await runner.run(Tool.ditto, [gameRoot.path, resources.appendingPathComponent("game").path])
         return app
     }
@@ -62,6 +62,19 @@ public struct BundleAssembler: Sendable {
             "NSHighResolutionCapable": true,
         ]
     }
+
+    static let dxmtNotice = """
+    This runtime combines Wine Staging 11.8_mm1, DXMT 0.80, and dependency libraries from Gcenx Wine 11.18.
+    Wine and DXMT are LGPL-2.1-or-later. Other dependencies retain their own licenses.
+    DXMT Copyright (c) 2023-2026 Feifan He for CodeWeavers. See COPYING.LIB.
+    Corresponding source and packaging:
+    https://github.com/zzzz465/homebrew-wine-dxmt/tree/v11.8_mm1
+    https://github.com/3Shain/dxmt/tree/v0.80
+    https://github.com/Gcenx/macOS_Wine_builds/releases/tag/11.18
+    https://github.com/Gcenx/macports-wine
+    Built with GameWrap for personal use. Do not redistribute games or this runtime without meeting their licenses.
+
+    """
 
     static let wineNotice = """
     This folder contains Wine from Apple's Game Porting Toolkit, as packaged by Gcenx:

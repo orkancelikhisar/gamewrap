@@ -24,7 +24,7 @@ public struct GameManifest: Codable, Equatable, Sendable {
     }
 
     public init(config: BuildConfig, redists: [String], runtimeID: String) {
-        var env = ["WINEMSYNC": "1"]
+        var env = runtimeID == DXMTRuntimeManager.runtimeID ? [:] : ["WINEMSYNC": "1"]
         if config.advertiseAVX { env["ROSETTA_ADVERTISE_AVX"] = "1" }
         self.init(name: config.name, exe: config.exe, args: config.args, redists: redists,
                   env: env, showFPS: config.showFPS, runtime: runtimeID)

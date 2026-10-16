@@ -64,6 +64,15 @@ struct ConfigureView: View {
                     Button("Change…", action: chooseDestination).controlSize(.small)
                 }
             }
+            VStack(alignment: .leading, spacing: 6) {
+                Picker("Compatibility engine", selection: $model.runtimeProfile) {
+                    ForEach(RuntimeProfile.allCases, id: \.self) { Text($0.title).tag($0) }
+                }.disabled(model.runtimeProgress != nil)
+                Text(model.runtimeProfile == .unity6
+                     ? "Tested with OFFRECORD. Direct3D 10/11 only; uses a separate save environment. First download: 491 MB."
+                     : "Recommended for games that already work, including Hyperballin.")
+                    .font(.caption).foregroundStyle(.secondary)
+            }
             DisclosureGroup("Advanced settings", isExpanded: $advanced) {
                 VStack(alignment: .leading, spacing: 12) {
                     TextField("Launch arguments", text: $model.argsText, prompt: Text("-dx11 -windowed"))

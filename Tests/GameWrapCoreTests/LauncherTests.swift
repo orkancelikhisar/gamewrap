@@ -2,6 +2,17 @@ import XCTest
 @testable import GameWrapCore
 
 final class LauncherTests: XCTestCase {
+    func testDXMTLaunchUsesModernWineAndSeparatePrefix() async throws {
+        let config = BuildConfig(name: "Unity Game", exe: "Game.exe", destination: try tempDir())
+        let manifest = GameManifest(config: config, redists: [], runtimeID: "wine-dxmt-11.8-0.80-v1")
+        XCTAssertNil(manifest.env["WINEMSYNC"])
+        let home = try tempDir()
+        let lines = try await dryRun(try await makeApp(manifest), home: home)
+        XCTAssertTrue(lines.contains("WINEPREFIX=\(home.path)/Library/Application Support/Unity Game/DXMT/prefix"))
+        XCTAssertTrue(lines.contains("WINEDLLOVERRIDES=winemenubuilder.exe=d;dxgi,d3d11,d3d10core=b"))
+        XCTAssertTrue(lines.contains { $0.hasPrefix("EXEC=") && $0.hasSuffix("/bin/wine|Game.exe") })
+    }
+
     func testLauncherHasValidSyntax() async throws {
         let script = try tempDir().appendingPathComponent("launcher")
         try Data(LauncherTemplate.script.utf8).write(to: script)

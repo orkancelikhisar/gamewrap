@@ -42,3 +42,7 @@ Replaced the landscape with a compact native animated pixel controller, increase
 ### Native interface and public release preparation
 
 Replaced the numbered two-column layout with a centered drop area and a single configuration view. Removed promotional headings, adopted system colors and typography, and added Command-O for choosing a game. The generated solarpunk illustration is a SwiftPM resource copied into the signed application bundle. Verified its rendering in the packaged app, the opening screen without scrolling, and the Command-O file picker. The complete unit suite passed again (69 passed, one opt-in integration test skipped); release packaging and strict code-signature checks passed. The earlier real-game acceptance limits still apply.
+
+### Integrated DXMT engine
+
+Added an opt-in Unity 6 / DXMT compatibility engine with three pinned and SHA-256-verified downloads. Regression coverage includes modern-Wine executable selection, graphics overrides, Standard/DXMT save-prefix isolation, checksum failure, incomplete graphics installation, and cache reuse. The full suite passed (73 passed, two opt-in integration tests skipped). An opt-in real-archive acceptance test separately passed: it composed the actual runtime and built and signed OFFRECORD through GameWrap’s normal pipeline. UI inspection confirmed the compatibility-engine picker is present; further interactive inspection was interrupted by the Mac locking. The earlier patched-runtime menu and opening-scene acceptance remains limited to startup and basic input.

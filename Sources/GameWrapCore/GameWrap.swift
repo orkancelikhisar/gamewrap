@@ -175,8 +175,10 @@ public final class GameWrap: Sendable {
                     throw GameWrapError.destinationExists(url)
                 }
             }
-            let perCopy = info.sizeBytes + Self.runtimeAllowance
-            let needed = config.output == .appAndDMG ? perCopy * 2 : perCopy
+            let runtimeSize: Int64 = runtime.spec.id == DXMTRuntimeManager.runtimeID ? 2_000_000_000 : Self.runtimeAllowance
+            let perCopy = info.sizeBytes + runtimeSize
+            let outputSpace = config.output == .appAndDMG ? perCopy * 2 : perCopy
+            let needed = outputSpace + (runtime.spec.id == DXMTRuntimeManager.runtimeID && !runtime.isInstalled() ? 2_000_000_000 : 0)
             let available = availableSpace(fm.temporaryDirectory)
             guard available >= needed else { throw GameWrapError.insufficientSpace(needed: needed, available: available) }
         }

@@ -41,3 +41,7 @@ aa0ea4c82e636ae7bca2076387cb0a5affa26509ad13f119ecd0d62bd7ba6f82  wine-devel-11.
 ```
 
 These hashes record the inputs tested here, rather than an independent upstream signature verification. Runtime and graphics components retain their upstream licenses and source obligations; the utility's MIT license does not relicense them.
+
+## Integrated GameWrap option
+
+GameWrap now offers **Unity 6 / DXMT (experimental)** in the configuration view. It automatically downloads the three pinned archives above, verifies their hashes, assembles a complete runtime cache, and bundles it into the generated game app. Choose this engine before building OFFRECORD. The default Standard engine remains available. Generated DXMT apps use `~/Library/Application Support/<Game name>/DXMT/prefix`, separate from the Standard engine.
