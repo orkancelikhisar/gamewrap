@@ -1,0 +1,23 @@
+name: macOS checks
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test-and-package:
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Test
+        run: swift test --scratch-path "$RUNNER_TEMP/gamewrap-build"
+      - name: Check shell scripts
+        run: zsh -n scripts/package-app.sh scripts/integration-test.sh
+      - name: Package and verify app
+        run: |
+          scripts/package-app.sh "$RUNNER_TEMP/gamewrap-output"
+          codesign --verify --deep --strict "$RUNNER_TEMP/gamewrap-output/GameWrap.app"

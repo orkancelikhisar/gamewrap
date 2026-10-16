@@ -1,0 +1,7 @@
+.build/
+.swiftpm/
+.superpowers/
+*.dmg
+*.app
+.DS_Store
+dist/
