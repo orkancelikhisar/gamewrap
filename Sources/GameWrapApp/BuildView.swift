@@ -74,7 +74,7 @@ struct BuildView: View {
 
     private func failed(_ message: String, _ suggestion: String) -> some View {
         VStack(alignment: .leading, spacing: 16) {
-            Image(systemName: "exclamationmark.square.fill").font(.system(size: 32)).foregroundStyle(FieldStyle.orange)
+            Image(systemName: "exclamationmark.square.fill").font(.system(size: 32)).foregroundStyle(FieldStyle.accent)
             Text("Couldn’t complete the request").font(.title2.weight(.semibold))
             Text(message).font(.system(size: 15, weight: .semibold)).textSelection(.enabled)
             Text(suggestion).font(.system(size: 12)).foregroundStyle(FieldStyle.muted).textSelection(.enabled)

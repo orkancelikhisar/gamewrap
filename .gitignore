@@ -5,3 +5,7 @@
 *.app
 .DS_Store
 dist/
+
+# Local Python tooling
+__pycache__/
+*.py[cod]

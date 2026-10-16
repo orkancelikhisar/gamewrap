@@ -5,7 +5,7 @@ enum FieldStyle {
     static let panel = Color(nsColor: .controlBackgroundColor)
     static let ink = Color.primary
     static let muted = Color.secondary
-    static let orange = Color.accentColor
+    static let accent = Color.accentColor
     static let line = Color(nsColor: .separatorColor)
 }
 
@@ -65,7 +65,7 @@ struct PixelController: View {
                                           y: origin.y + CGFloat(row) * cell,
                                           width: cell + 0.5, height: cell + 0.5)
                         context.fill(Path(rect), with: .color(pixel == "O" ? FieldStyle.paper :
-                            (highlighted ? FieldStyle.orange : FieldStyle.ink)))
+                            (highlighted ? FieldStyle.accent : FieldStyle.ink)))
                     }
                 }
                 for index in 0..<8 {
@@ -75,7 +75,7 @@ struct PixelController: View {
                     let y: CGFloat = size.height / 2 + CGFloat(sin(angle) * (25 + drift))
                     let opacity = reduceMotion ? 0.5 : 0.35 + (sin(time + angle) + 1) * 0.2
                     context.fill(Path(CGRect(x: x, y: y, width: 4, height: 4)),
-                                 with: .color(FieldStyle.orange.opacity(opacity)))
+                                 with: .color(FieldStyle.accent.opacity(opacity)))
                 }
             }
         }

@@ -1,48 +1,53 @@
-# Verification record
+# Testing and verification
 
-Verified locally on 2026-10-16 using an Apple silicon Mac running macOS 26.6.2. This is an early-preview acceptance record, not a claim that every Windows game or supported macOS version works.
+Last verified: 2026-10-16, Apple silicon, macOS 26.6.2. GameWrap is an early preview; successful packaging does not establish game compatibility.
 
-## Automated checks
+## Routine checks
 
-- Core suite: 68 tests, 67 passed and the opt-in integration test skipped, zero failures.
-- App model regressions: 2 passed. Covers resetting per-game settings/diagnostics and preserving the current icon when an unreadable image is selected. Both tests were observed failing before their fixes.
-- Opt-in integration: 1 passed with real tools. Built and signed an app with the cached runtime, executed bundled Wine, checked launcher dry-run paths, and created/verified/mounted/inspected a DMG.
-- Release packaging: app built and ad-hoc signature verified. The package includes its own icon, MIT license, and third-party notices.
-- A macOS GitHub Actions workflow is supplied; it has not yet run on GitHub.
+```sh
+swift test --scratch-path "${TMPDIR:-/tmp/}gamewrap-build"
+zsh -n scripts/package-app.sh scripts/integration-test.sh
+scripts/package-app.sh /tmp/gamewrap-preview
+codesign --verify --deep --strict /tmp/gamewrap-preview/GameWrap.app
+```
 
-## Native UI acceptance
+The latest full suite passed: **73 passed, two opt-in tests skipped, zero failures**. It covers importing, PE detection, icons, argument quoting, both launcher profiles, isolated save paths, runtime checksums, incomplete installations, cache reuse, build cancellation, packaging, and app-model regressions.
 
-- Packaged app opens and reports the installed runtime.
-- Choosing an empty folder displays a useful error; Back returns to game selection.
-- The Hyperballin RAR imports successfully, detects `project_garden/Binaries/Win64/project_garden-Win64-Shipping.exe`, and extracts its blue ball icon.
-- Switching App to App + DMG updates the default destination. Selecting a custom destination works.
-- Building Hyperballin through the UI produces an app and DMG successfully.
-- The redesign keeps selection and setup in one window. Settings, progress, results, and error recovery occupy the same right-hand panel. Advanced settings are collapsible; the icon picker is a labeled button.
+[Hosted macOS checks](https://github.com/orkancelikhisar/gamewrap/actions) run the normal suite, shell syntax checks, and release packaging/signature verification. They do not run games or download the runtime fixtures.
 
-## Real-game acceptance
+## Opt-in runtime acceptance
 
-Hyperballin Alpha rc0209 was built from its local RAR through GameWrap's UI using the pinned GPTK 3.0-3 runtime.
+### Standard engine
 
-- First launch completed prefix setup and created `.gamewrap-ready`.
-- Startup graphics and the animated main menu rendered visibly.
-- Quit/relaunch reused the existing setup marker; D3DMetal output was recorded in the game log.
-- D3DMetal emitted unsupported-API warnings. These did not prevent the observed menu from rendering.
-- Extended gameplay, performance, controller behavior, save persistence, and a second game have not been validated.
+```sh
+scripts/integration-test.sh
+```
 
-## Before a stable public release
+Previously passed with the real cached runtime and macOS tools: app assembly/signing, bundled Wine execution, launcher dry run, DMG creation, verification, mounting, and contents inspection. First-time runtime download is approximately 240 MB.
 
-Test on the oldest claimed macOS version and a second Mac, validate a second game, and perform longer gameplay checks. A downloaded-runtime installation on a clean machine also needs manual acceptance. Signing is ad hoc; Developer ID signing/notarization is not configured.
+### Unity 6 / DXMT engine
 
-The repository has no configured Git remote at the time of this record. Publishing and hosted CI remain outstanding.
+Prepare a directory containing the pinned archives listed in [OFFRECORD compatibility](compatibility/OFFRECORD.md), named `wine.tar.xz`, `dxmt.tar.gz`, and `dependencies.tar.xz`. Provide a dedicated game folder containing OFFRECORD's files:
 
-### Opening-screen refinement
+```sh
+GAMEWRAP_DXMT_ARCHIVES=/path/to/archives \
+GAMEWRAP_DXMT_GAME=/path/to/OFFRECORD \
+swift test --scratch-path "${TMPDIR:-/tmp/}gamewrap-build" \
+  --filter DXMTRuntimeTests.testRealDXMTInstallerAndGameBuild
+```
 
-Replaced the landscape with a compact native animated pixel controller, increased the minimum window height to 620 points, and verified the opening screen fits with its footer and no scrollbar. Motion pauses when the scene is inactive and respects Reduce Motion. The revised release build and code-signature verification passed.
+This test installs the real engine into GameWrap's runtime cache and creates `/tmp/gamewrap-integrated-dxmt/OFFRECORD Integrated DXMT.app`. It requires Rosetta 2 and several GB of free disk space. Use a fresh output location by moving an existing acceptance app before repeating the test.
 
-### Native interface and public release preparation
+The real test passed independently of the normal suite. It verified composition of the pinned archives, app assembly, signing, manifest settings, and bundled license. First launch completed in the isolated DXMT prefix; its installed graphics DLLs matched the bundled copies. The Unity log reached the opening game scene. Interactive inspection of the final integrated UI was interrupted by the Mac locking; the engine picker itself was observed.
 
-Replaced the numbered two-column layout with a centered drop area and a single configuration view. Removed promotional headings, adopted system colors and typography, and added Command-O for choosing a game. The generated solarpunk illustration is a SwiftPM resource copied into the signed application bundle. Verified its rendering in the packaged app, the opening screen without scrolling, and the Command-O file picker. The complete unit suite passed again (69 passed, one opt-in integration test skipped); release packaging and strict code-signature checks passed. The earlier real-game acceptance limits still apply.
+## Manual acceptance recorded
 
-### Integrated DXMT engine
+- Opening screen fits without scrolling; native system appearance, keyboard selection with Command-O, and animated pixel controller are present. Motion respects Reduce Motion and pauses for inactive scenes.
+- The solarpunk illustration is used in the README only, not bundled in the app.
+- Choosing an empty folder produces an error with recovery and diagnostics.
+- Hyperballin imported, built, completed first-launch setup, and rendered its menu with Standard. Relaunch reused its prefix. A save file was observed; restoration of game progress was not verified.
+- OFFRECORD rendered its menu, accepted Start Game, and reached its opening scene with the patched Wine/DXMT combination. See [compatibility details](compatibility/OFFRECORD.md).
 
-Added an opt-in Unity 6 / DXMT compatibility engine with three pinned and SHA-256-verified downloads. Regression coverage includes modern-Wine executable selection, graphics overrides, Standard/DXMT save-prefix isolation, checksum failure, incomplete graphics installation, and cache reuse. The full suite passed (73 passed, two opt-in integration tests skipped). An opt-in real-archive acceptance test separately passed: it composed the actual runtime and built and signed OFFRECORD through GameWrap’s normal pipeline. UI inspection confirmed the compatibility-engine picker is present; further interactive inspection was interrupted by the Mac locking. The earlier patched-runtime menu and opening-scene acceptance remains limited to startup and basic input.
+## Remaining release validation
+
+Full-game play, performance, audio, controllers, and save/load restoration remain unverified. Test on the oldest supported macOS version, a second Mac, and a clean runtime installation. Signing remains ad hoc; Developer ID signing and notarization are not configured.

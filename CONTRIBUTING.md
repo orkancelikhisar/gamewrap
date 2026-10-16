@@ -12,13 +12,15 @@ scripts/package-app.sh /tmp/gamewrap-preview
 open /tmp/gamewrap-preview/GameWrap.app
 ```
 
-Keep build products outside iCloud-synced folders: File Provider attributes can interfere with code signing. The normal suite uses small generated fixtures, not commercial game files. It skips the runtime integration test.
+Keep build products outside iCloud-synced folders: File Provider attributes can interfere with code signing. The normal suite uses small generated fixtures, not commercial game files. It skips the two opt-in runtime integration tests.
 
 ```sh
 scripts/integration-test.sh
 ```
 
 The opt-in integration test uses real signing and disk-image tools and downloads approximately 240 MB on its first run. Rosetta 2 is required to execute the bundled Wine. Hosted CI runs the normal suite and packaging check; it does not establish game compatibility.
+
+The DXMT acceptance test additionally requires local copies of the three pinned archives and a game folder. See [verification instructions](docs/TESTING.md).
 
 ## Make a change
 
@@ -32,6 +34,6 @@ The opt-in integration test uses real signing and disk-image tools and downloads
 
 ## Compatibility reports
 
-Include your Mac chip, macOS version, GameWrap revision, game version, chosen executable, launch arguments, and observed behavior. Distinguish “builds successfully” from “launches and renders” and “playable.” Review logs for usernames, paths, and other personal information before sharing them. Do not attach copyrighted game files.
+Include your Mac chip, macOS version, GameWrap revision, game version, compatibility engine, chosen executable, launch arguments, and observed behavior. Distinguish “builds successfully” from “launches and renders” and “playable.” Review logs for usernames, paths, and other personal information before sharing them. Do not attach copyrighted game files.
 
 Be respectful and constructive. Contributions are provided under the project's MIT license.
