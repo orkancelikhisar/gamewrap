@@ -10,9 +10,9 @@ struct GameWrapApp: App {
         Window("GameWrap", id: "main") {
             ContentView()
                 .environmentObject(model)
-                .frame(minWidth: 640, idealWidth: 720, minHeight: 600, idealHeight: 640)
+                .frame(minWidth: 640, idealWidth: 660, minHeight: 520, idealHeight: 560)
         }
-        .defaultSize(width: 720, height: 640)
+        .defaultSize(width: 660, height: 560)
         .windowResizability(.contentMinSize)
     }
 }
@@ -36,9 +36,9 @@ struct ContentView: View {
                 switch model.phase {
                 case .drop: DropView()
                 case .configure:
-                    ScrollView { ConfigureView().padding(24).frame(maxWidth: 600) }
+                    ScrollView { ConfigureView().padding(24).frame(maxWidth: 540) }
                 case .building, .done, .failed:
-                    ScrollView { BuildView().padding(24).frame(maxWidth: 600) }
+                    ScrollView { BuildView().padding(24).frame(maxWidth: 540) }
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

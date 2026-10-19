@@ -8,7 +8,7 @@ struct DropView: View {
     var body: some View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
-                Text("Add a Windows game").font(.title2.weight(.semibold))
+                Text("Add a Windows game").font(.title2.weight(.medium))
                 Text("Drop a game folder or archive to create a Mac app.")
                     .font(.body).foregroundStyle(.secondary)
             }
@@ -17,8 +17,8 @@ struct DropView: View {
                 if let message = model.busyMessage {
                     ProgressView(message).controlSize(.small)
                 } else {
-                    Button("Choose Game…", action: choose)
-                        .buttonStyle(.borderedProminent).controlSize(.large)
+                    Button("Choose game…", action: model.chooseGame)
+                        .buttonStyle(.borderedProminent)
                         .keyboardShortcut("o", modifiers: .command)
                         .disabled(locked)
                         .help("Choose a game (⌘O)")
@@ -35,7 +35,7 @@ struct DropView: View {
             Text("Game compatibility varies. Rosetta 2 is required.")
                 .font(.caption).foregroundStyle(.secondary)
         }
-        .padding(24).frame(maxWidth: 600)
+        .padding(24).frame(maxWidth: 480)
         .dropDestination(for: URL.self) { urls, _ in
             guard let url = urls.first, !locked else { return false }
             model.startOver()
@@ -49,18 +49,7 @@ struct DropView: View {
         return model.busyMessage != nil
     }
 
-    private func choose() {
-        let panel = NSOpenPanel()
-        panel.title = "Choose your Windows game"
-        panel.prompt = "Choose game"
-        panel.canChooseFiles = true
-        panel.canChooseDirectories = true
-        panel.allowsMultipleSelection = false
-        if panel.runModal() == .OK, let url = panel.url {
-            model.startOver()
-            model.open(url)
-        }
-    }
+
 }
 
 struct RuntimeStatusView: View {

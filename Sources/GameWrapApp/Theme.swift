@@ -25,13 +25,6 @@ struct FieldButton: ButtonStyle {
     }
 }
 
-struct FieldCaption: View {
-    let text: String
-    var body: some View {
-        Text(text).font(.system(size: 12, weight: .medium)).foregroundStyle(.secondary)
-    }
-}
-
 // Small native pixel animation, paused for accessibility and inactive windows.
 struct PixelController: View {
     var highlighted = false

@@ -79,6 +79,21 @@ final class AppModel: ObservableObject {
         }
     }
 
+    func chooseGame() {
+        guard busyMessage == nil else { return }
+        if case .building = phase { return }
+        let panel = NSOpenPanel()
+        panel.title = "Choose your Windows game"
+        panel.prompt = "Choose game"
+        panel.canChooseFiles = true
+        panel.canChooseDirectories = true
+        panel.allowsMultipleSelection = false
+        if panel.runModal() == .OK, let url = panel.url {
+            startOver()
+            open(url)
+        }
+    }
+
     func chooseDestination(_ url: URL) {
         destination = url
         destinationChosen = true

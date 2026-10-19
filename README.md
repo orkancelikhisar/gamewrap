@@ -1,12 +1,14 @@
 # GameWrap
 
-![Solarpunk gaming garden](assets/solarpunk.png)
+**Windows games. Double-clickable Mac apps.**
 
-**Turn Windows games into Mac apps.**
+[Get started](#build-and-install) · [Compatibility](#compatibility) · [Contribute](CONTRIBUTING.md)
 
-GameWrap turns a Windows game folder, `.exe`, `.zip`, `.rar`, or `.7z` into a double-clickable Mac app, with an optional DMG. A native, single-screen interface helps you choose the program, customize its icon, and build a self-contained app using Wine and D3DMetal.
+![A quiet solarpunk gaming garden](assets/solarpunk.png)
 
-**Status: early preview.** Building an app does not guarantee that its game will run. Compatibility depends on the game, your Mac, and the bundled runtime. Anti-cheat, DRM, launchers, and some graphics features may prevent a game from working.
+A native Mac utility that wraps a Windows game folder, EXE, ZIP, RAR, or 7Z into a self-contained app, with an optional disk image. Choose your game, check the engine, and build. Your files and saves stay on your Mac; no account is required.
+
+Apple silicon · macOS 14+ · MIT license · Early preview
 
 ## Requirements
 
@@ -52,7 +54,16 @@ Your original game files stay untouched. Each generated app includes its own run
 
 Saves, Windows settings, and `last-run.log` live in `~/Library/Application Support/<Game name>/`. The DXMT engine uses `~/Library/Application Support/<Game name>/DXMT/` instead, so switching engines does not migrate or overwrite existing saves. The runtime cache lives in `~/Library/Application Support/GameWrap/runtimes/`. Removing a generated app does not delete its saves. Games with the same app name share that support folder, so use distinct names for separate installations.
 
-## Experimental Unity 6 compatibility
+## Compatibility
+
+GameWrap is an early preview. A successful build does not guarantee a playable game. Anti-cheat, DRM, launchers, and unsupported Windows features can prevent games from working.
+
+| Game | Engine | Observed result |
+| --- | --- | --- |
+| Hyperballin | Standard | Menu renders; a save file was created |
+| OFFRECORD | Unity 6 / DXMT | Menu and opening scene render |
+
+These are startup checks, not full-game compatibility certifications. See [verification details](docs/TESTING.md).
 
 Choose **Unity 6 / DXMT (experimental)** under Compatibility engine before building. GameWrap downloads and verifies a pinned Wine 11.8 + DXMT 0.80 runtime and its dependencies, then bundles them into your Mac app. This combination reached OFFRECORD’s menu and opening scene. It supports Direct3D 10/11; keep Standard for games that require D3DMetal, including Direct3D 12 games. See [tested configuration](docs/compatibility/OFFRECORD.md). Saves are isolated by engine and are not automatically migrated.
 

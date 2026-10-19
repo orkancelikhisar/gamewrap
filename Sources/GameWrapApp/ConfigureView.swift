@@ -8,18 +8,16 @@ struct ConfigureView: View {
     @State private var advanced = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Create Mac app")
-                .font(.title2.weight(.semibold))
-            HStack(spacing: 16) {
+        VStack(alignment: .leading, spacing: 22) {
+            HStack(spacing: 14) {
                 Button(action: chooseIcon) {
                     Group {
                         if let image = model.iconPreview {
                             Image(nsImage: image).resizable().interpolation(.high)
                         } else {
-                            Image(systemName: "gamecontroller").resizable().scaledToFit().padding(12)
+                            Image(systemName: "gamecontroller").resizable().scaledToFit().padding(10)
                         }
-                    }.frame(width: 64, height: 64)
+                    }.frame(width: 48, height: 48)
                 }
                 .buttonStyle(.plain).accessibilityLabel("Choose game icon")
                 .help("Choose an icon, or drop an image here")
@@ -28,52 +26,55 @@ struct ConfigureView: View {
                     model.setCustomIcon(url)
                     return true
                 }
-                VStack(alignment: .leading, spacing: 6) {
-                    FieldCaption(text: "App name")
+                VStack(alignment: .leading, spacing: 4) {
                     TextField("Game name", text: $model.name)
-                        .textFieldStyle(.roundedBorder)
-                        .font(.system(size: 17, weight: .medium))
+                        .textFieldStyle(.plain).font(.title2.weight(.medium))
+                        .accessibilityLabel("App name")
+                    Text("Ready to make a Mac app.").font(.caption).foregroundStyle(.secondary)
                 }
+                Button("Change…", action: model.chooseGame)
+                    .buttonStyle(.plain).foregroundStyle(.secondary)
+                    .keyboardShortcut("o", modifiers: .command)
+                    .help("Choose another game (⌘O)")
             }
-            VStack(alignment: .leading, spacing: 8) {
-                FieldCaption(text: "Windows program")
-                Picker("Program", selection: $model.exe) {
-                    ForEach(model.info?.candidates ?? []) { candidate in
-                        Text(candidate.relativePath + (candidate.machine == .x86 ? " (32-bit)" : ""))
-                            .tag(candidate.relativePath)
+            Grid(alignment: .leading, horizontalSpacing: 18, verticalSpacing: 14) {
+                GridRow {
+                    Text("Program").foregroundStyle(.secondary)
+                    Picker("Program", selection: $model.exe) {
+                        ForEach(model.info?.candidates ?? []) { candidate in
+                            Text(candidate.relativePath + (candidate.machine == .x86 ? " (32-bit)" : ""))
+                                .tag(candidate.relativePath)
+                        }
+                    }.labelsHidden().frame(maxWidth: .infinity)
+                }
+                GridRow {
+                    Text("Engine").foregroundStyle(.secondary)
+                    Picker("Compatibility engine", selection: $model.runtimeProfile) {
+                        ForEach(RuntimeProfile.allCases, id: \.self) { Text($0.title).tag($0) }
+                    }.labelsHidden().disabled(model.runtimeProgress != nil)
+                }
+                GridRow {
+                    Text("Output").foregroundStyle(.secondary)
+                    Picker("Output", selection: $model.makeDMG) {
+                        Text("Mac app").tag(false)
+                        Text("Mac app + disk image").tag(true)
+                    }.labelsHidden()
+                }
+                GridRow {
+                    Text("Save to").foregroundStyle(.secondary)
+                    HStack {
+                        Text(model.destination.lastPathComponent).lineLimit(1)
+                            .truncationMode(.middle).help(model.destination.path)
+                        Spacer(minLength: 8)
+                        Button("Change…", action: chooseDestination).controlSize(.small)
                     }
-                }.labelsHidden().frame(maxWidth: .infinity, alignment: .leading)
-                Text("The most likely game is selected. Choose a different program if needed.")
-                    .font(.system(size: 11)).foregroundStyle(FieldStyle.muted)
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                FieldCaption(text: "Build output")
-                Picker("Output", selection: $model.makeDMG) {
-                    Text("Mac app").tag(false)
-                    Text("Mac app + DMG").tag(true)
-                }.pickerStyle(.segmented)
-                Text(model.makeDMG ? "An app plus a disk image for your personal archive." : "A self-contained app. Double-click it to play.")
-                    .font(.system(size: 11)).foregroundStyle(FieldStyle.muted)
-            }
-            VStack(alignment: .leading, spacing: 8) {
-                FieldCaption(text: "Save to")
-                HStack {
-                    Text(model.destination.path).font(.system(size: 11, design: .monospaced))
-                        .lineLimit(1).truncationMode(.middle).help(model.destination.path)
-                    Spacer(minLength: 0)
-                    Button("Change…", action: chooseDestination).controlSize(.small)
                 }
-            }
-            VStack(alignment: .leading, spacing: 6) {
-                Picker("Compatibility engine", selection: $model.runtimeProfile) {
-                    ForEach(RuntimeProfile.allCases, id: \.self) { Text($0.title).tag($0) }
-                }.disabled(model.runtimeProgress != nil)
-                Text(model.runtimeProfile == .unity6
-                     ? "Tested with OFFRECORD. Direct3D 10/11 only; uses a separate save environment. First download: 491 MB."
-                     : "Recommended for games that already work, including Hyperballin.")
+            }.font(.system(size: 13))
+            if model.runtimeProfile == .unity6 {
+                Text("DXMT supports Direct3D 10/11 and uses a separate save environment. First download: 491 MB.")
                     .font(.caption).foregroundStyle(.secondary)
             }
-            DisclosureGroup("Advanced settings", isExpanded: $advanced) {
+            DisclosureGroup("Advanced options", isExpanded: $advanced) {
                 VStack(alignment: .leading, spacing: 12) {
                     TextField("Launch arguments", text: $model.argsText, prompt: Text("-dx11 -windowed"))
                         .textFieldStyle(.roundedBorder)
@@ -82,22 +83,20 @@ struct ConfigureView: View {
                     Toggle("Show FPS overlay", isOn: $model.showFPS)
                     if let info = model.info {
                         Text("Game folder: \(info.imported.gameRoot.path)")
-                            .font(.system(size: 10, design: .monospaced))
-                            .foregroundStyle(FieldStyle.muted).textSelection(.enabled)
+                            .font(.caption).foregroundStyle(.secondary).textSelection(.enabled)
                     }
                 }.padding(.top, 12)
             }.font(.system(size: 12))
-            Divider().overlay(FieldStyle.line)
-            Text("Compatibility varies by game. First launch may take a minute while the Windows environment is prepared.")
-                .font(.system(size: 11)).foregroundStyle(FieldStyle.muted)
-            HStack {
-                Button("Cancel", action: model.startOver).buttonStyle(FieldButton())
+            HStack(alignment: .center) {
+                Button("Cancel", action: model.startOver).keyboardShortcut(.cancelAction)
                 Spacer()
-                Button("Build Mac App") { model.build() }
-                    .buttonStyle(FieldButton(primary: true))
+                Button("Build Mac app") { model.build() }
+                    .buttonStyle(.borderedProminent)
                     .keyboardShortcut(.defaultAction)
                     .disabled(model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
+            Text("Original game files stay untouched. Compatibility varies by game.")
+                .font(.caption).foregroundStyle(.secondary)
         }
         .alert("Replace existing output?", isPresented: $model.confirmOverwrite) {
             Button("Replace", role: .destructive) { model.build(overwrite: true) }
